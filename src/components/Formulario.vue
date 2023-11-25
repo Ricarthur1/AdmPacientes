@@ -42,6 +42,15 @@
         }
 
         emit('guardar-paciente')
+        alerta.mensaje = 'Paciente agregado correctamente'
+        alerta.tipo = 'exito'
+
+        setTimeout(() => {
+            Object.assign(alerta, {
+                tipo: '',
+                mensaje: ''
+            })
+        }, 3000);
     }
 
 
