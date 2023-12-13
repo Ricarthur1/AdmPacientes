@@ -5,6 +5,7 @@ import { uid } from 'uid'
 import Header from './components/Header.vue'
 import Formulario from './components/Formulario.vue'
 import Paciente from './components/Paciente.vue'
+import { objectToString } from '@vue/shared'
 
     const pacientes = ref([])
 
@@ -18,18 +19,29 @@ import Paciente from './components/Paciente.vue'
     })
 
     const guardarPaciente = () => {
-        pacientes.value.push({...paciente, id: uid()})
-
+        if (paciente.id) {
+            const { id } = paciente
+            const i = pacientes.value.findIndex((e) => e.id === id )
+            pacientes.value[i] = {...paciente}
+        } else {
+            pacientes.value.push({...paciente, id: uid()})
+        }
         //Reiniciar el objeto
         Object.assign(paciente, {
             nombre: '',
             propietario: '',
             email: '',
             alta: '',
-            sintomas: ''
+            sintomas: '',
+            id: null
 
         })
 
+    }
+
+    const actualizarPaciente  = (id) => {
+        const pacienteEditar = pacientes.value.filter( paciente => paciente.id === id )[0]
+        Object.assign(paciente, pacienteEditar)
     }
 
 
@@ -63,6 +75,7 @@ import Paciente from './components/Paciente.vue'
                     <Paciente
                         v-for="paciente in pacientes"
                         :paciente="paciente"
+                        @actualizar-paciente="actualizarPaciente"
 
                     />
                 </div>
