@@ -1,5 +1,5 @@
 <script setup>
-import {ref, reactive} from 'vue'
+import {ref, reactive, watch, onMounted} from 'vue'
 import { uid } from 'uid'
 
 import Header from './components/Header.vue'
@@ -16,6 +16,23 @@ import { objectToString } from '@vue/shared'
         email: '',
         alta: '',
         sintomas: ''
+    })
+
+    watch(pacientes, () => {
+        guardarLocalStorage()
+    }, {
+        deep: true
+    })
+
+    const guardarLocalStorage = () => {
+        localStorage.setItem('pacientes', JSON.stringify(pacientes.value))
+    }
+
+    onMounted(( ) => {
+        const pacientesStorage = localStorage.getItem('pacientes')
+        if (pacientesStorage) {
+            pacientes.value = JSON.parse(pacientesStorage)
+        }
     })
 
     const guardarPaciente = () => {
@@ -44,6 +61,11 @@ import { objectToString } from '@vue/shared'
         Object.assign(paciente, pacienteEditar)
     }
 
+    const eliminarPaciente = (id) => {
+        //pacientes.value.splice(id)
+        pacientes.value = pacientes.value.filter(paciente => paciente.id !== id)
+    }
+
 
 </script>
 
@@ -60,6 +82,7 @@ import { objectToString } from '@vue/shared'
             v-model:alta="paciente.alta"
             v-model:sintomas="paciente.sintomas"
             @guardar-paciente="guardarPaciente"
+            :id="paciente.id"
             />
 
             <div class="md:w-1/2 md:h-screen overflow-y-scroll">
@@ -76,7 +99,7 @@ import { objectToString } from '@vue/shared'
                         v-for="paciente in pacientes"
                         :paciente="paciente"
                         @actualizar-paciente="actualizarPaciente"
-
+                        @eliminar-paciente="eliminarPaciente"
                     />
                 </div>
                 <p v-else class="mt-20 text-2xl text-center" >No hay Pacientes</p>
